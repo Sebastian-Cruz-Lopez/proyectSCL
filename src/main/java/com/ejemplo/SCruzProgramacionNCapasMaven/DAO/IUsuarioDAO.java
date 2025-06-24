@@ -18,5 +18,9 @@ public interface IUsuarioDAO {
     Result UpdateUsuario(Usuario usuario);
 
     Result UpdateDireccion(Direccion direccion);
+    
+    Result DeleteUsuario(int idUsuario);
+    
+    Result DeleteDireccion(int idDireccion);
 
 }

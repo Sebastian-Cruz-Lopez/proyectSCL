@@ -1,7 +1,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-    
+
     <body layout:fragment="body" style="background-color: cadetblue;" >
         <div class="container text-center mt-5">
 
@@ -79,7 +79,8 @@
                                     </ul>
                                 </td>
                                 <td>
-                                    <a class="btn btn-danger">
+                                    <a class="btn btn-danger" th:href="@{'/usuario/delete/' + ${usuarioDireccion.Usuario.idUsuario}}"
+                                       onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?')">
                                         <i class="bi bi-person-dash"></i>
                                     </a>
                                 </td>

@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/usuario")
@@ -253,43 +254,30 @@ public class UsuarioController {
                 UsuarioDireccion usuarioDireccion = new UsuarioDireccion();
                 Usuario usuario = new Usuario();
                 Direccion direccion = new Direccion();
-                Colonia colonia = new Colonia();
                 Roll roll = new Roll();
 
-                usuario.setUsername(getStringValue(filaActual.getCell(0)));
-                usuario.setNombre(getStringValue(filaActual.getCell(1)));
-                usuario.setApellidoPaterno(getStringValue(filaActual.getCell(2)));
-                usuario.setApellidoMaterno(getStringValue(filaActual.getCell(3)));
-                usuario.setEmail(getStringValue(filaActual.getCell(4)));
-                usuario.setPassword(getStringValue(filaActual.getCell(5)));
-                usuario.setTelefono(getStringValue(filaActual.getCell(6)));
-                usuario.setCelular(getStringValue(filaActual.getCell(7)));
-                usuario.setCURP(getStringValue(filaActual.getCell(8)));
-
-                usuario.setFechaNacimiento(filaActual.getCell(9).getDateCellValue());
-
-                String sexo = getStringValue(filaActual.getCell(10));
+                usuario.setNombre(getStringValue(filaActual.getCell(0)));
+                usuario.setApellidoPaterno(getStringValue(filaActual.getCell(1)));
+                usuario.setApellidoMaterno(getStringValue(filaActual.getCell(2)));
+                usuario.setFechaNacimiento(filaActual.getCell(3).getDateCellValue());
+                usuario.setTelefono(getStringValue(filaActual.getCell(4)));
+                usuario.setEmail(getStringValue(filaActual.getCell(5)));
+                usuario.setUsername(getStringValue(filaActual.getCell(6)));
+                usuario.setPassword(getStringValue(filaActual.getCell(7)));
+                String sexo = getStringValue(filaActual.getCell(8));
                 if (sexo != null && !sexo.isEmpty()) {
                     usuario.setSexo(sexo.charAt(0));
                 }
+                usuario.setCelular(getStringValue(filaActual.getCell(9)));
+                usuario.setCURP(getStringValue(filaActual.getCell(10)));
 
-                usuario.setImagen(getStringValue(filaActual.getCell(11)));
-
-                Cell rollCell = filaActual.getCell(12);
+                Cell rollCell = filaActual.getCell(11);
                 if (rollCell != null && rollCell.getCellType() == CellType.NUMERIC) {
                     roll.setIdRoll((int) rollCell.getNumericCellValue());
                     usuario.setRoll(roll);
                 }
 
-                direccion.setCalle(getStringValue(filaActual.getCell(13)));
-                direccion.setNumeroInterior(getStringValue(filaActual.getCell(14)));
-                direccion.setNumeroExterior(getStringValue(filaActual.getCell(15)));
-
-                Cell coloniaCell = filaActual.getCell(16);
-                if (coloniaCell != null && coloniaCell.getCellType() == CellType.NUMERIC) {
-                    colonia.setIdColonia((int) coloniaCell.getNumericCellValue());
-                    direccion.setColonia(colonia);
-                }
+                usuario.setImagen(getStringValue(filaActual.getCell(12)));
 
                 usuarioDireccion.setUsuario(usuario);
                 usuarioDireccion.setDireccion(direccion);
@@ -334,6 +322,8 @@ public class UsuarioController {
 
     public List<UsuarioDireccion> LecturaArchivoTXT(MultipartFile archivo) {
 
+        Result result = new Result();
+
         List<UsuarioDireccion> usuariosDireccion = new ArrayList<>();
 
         try (InputStream inputStream = archivo.getInputStream(); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));) {
@@ -373,6 +363,7 @@ public class UsuarioController {
 
         } catch (Exception ex) {
             usuariosDireccion = null;
+            result.errorMessage = ex.getLocalizedMessage();
         }
         return usuariosDireccion;
     }
@@ -444,20 +435,6 @@ public class UsuarioController {
                 if (usuariodireccion.Usuario.getImagen() == null || usuariodireccion.Usuario.getImagen().equals("")) {
                     listaErrores.add(new ResultValidaDatos(fila, "Imagen", "Campo obligatorio"));
                 }
-
-                if (usuariodireccion.Direccion == null || usuariodireccion.Direccion.getCalle() == null || usuariodireccion.Direccion.getCalle().equals("")) {
-                    listaErrores.add(new ResultValidaDatos(fila, "Calle", "Campo obligatorio"));
-                }
-                if (usuariodireccion.Direccion.getNumeroInterior() == null || usuariodireccion.Direccion.getNumeroInterior().equals("")) {
-                    listaErrores.add(new ResultValidaDatos(fila, "Número Interior", "Campo obligatorio"));
-                }
-                if (usuariodireccion.Direccion.getNumeroExterior() == null || usuariodireccion.Direccion.getNumeroExterior().equals("")) {
-                    listaErrores.add(new ResultValidaDatos(fila, "Número Exterior", "Campo obligatorio"));
-                }
-
-                if (usuariodireccion.Direccion.Colonia == null || usuariodireccion.Direccion.Colonia.getIdColonia() == 0) {
-                    listaErrores.add(new ResultValidaDatos(fila, "Colonia", "Campo obligatorio"));
-                }
                 fila++;
             }
         }
@@ -499,6 +476,32 @@ public class UsuarioController {
     public Result GetColoniasByMunicipio(@PathVariable("idMunicipio") int idMunicipio) {
 
         return coloniaDAOImplementation.GetColoniasByMunicipio(idMunicipio);
+    }
+
+    @GetMapping("/delete/{idUsuario}")
+    public String DeleteUsuario(@PathVariable int idUsuario, RedirectAttributes redirectAttrs) {
+        Result result = usuarioDAOImplementation.DeleteUsuario(idUsuario); // eliminación física
+
+        if (result.correct) {
+            redirectAttrs.addFlashAttribute("mensaje", "Usuario eliminado exitosamente.");
+        } else {
+            redirectAttrs.addFlashAttribute("error", "Error al eliminar el usuario.");
+        }
+
+        return "redirect:/usuario";
+    }
+
+    @GetMapping("/deletedireccion")
+    public String DeleteDireccion(@RequestParam int idDireccion, @RequestParam int idUsuario, RedirectAttributes redirectAttrs) {
+        Result result = usuarioDAOImplementation.DeleteDireccion(idDireccion); // eliminación física
+
+        if (result.correct) {
+            redirectAttrs.addFlashAttribute("mensaje", "Dirección eliminada correctamente.");
+        } else {
+            redirectAttrs.addFlashAttribute("error", "Error al eliminar la dirección.");
+        }
+
+        return "redirect:/usuario/form/" + idUsuario;
     }
 
 }

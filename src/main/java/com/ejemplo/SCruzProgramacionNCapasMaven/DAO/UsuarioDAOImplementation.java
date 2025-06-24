@@ -411,4 +411,40 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
         return result;
     }
 
+    @Override
+    public Result DeleteUsuario(int idUsuario) {
+        Result result = new Result();
+        try {
+            jdbcTemplate.execute("{CALL UsuarioDeleteTotalSP(?)}", (CallableStatementCallback<Object>) cs -> {
+                cs.setInt(1, idUsuario);
+                cs.execute();
+                result.correct = true;
+                return null;
+            });
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+
+    @Override
+    public Result DeleteDireccion(int idDireccion) {
+        Result result = new Result();
+        try {
+            jdbcTemplate.execute("{CALL DireccionDeleteSP(?)}", (CallableStatementCallback<Object>) cs -> {
+                cs.setInt(1, idDireccion);
+                cs.execute();
+                result.correct = true;
+                return null;
+            });
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
+            result.ex = ex;
+        }
+        return result;
+    }
+
 }

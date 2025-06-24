@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-    
+
     <body layout:fragment="body" style="background-color: cadetblue;">
         <div class="container mt-4">
             <div class="p-4 bg-white rounded shadow">
@@ -71,7 +71,9 @@
                                 </td>
                                 <td>
 
-                                    <a  class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></a>
+                                    <a  class="btn btn-danger btn-sm" th:href="@{/usuario/deletedireccion(idDireccion=${direccion.idDireccion}, idUsuario=${usuarioDireccion.Usuario.idUsuario})}"
+                                        onclick="return confirm('¿Eliminar esta dirección?')"
+                                        ><i class="bi bi-trash"></i></a>
                                 </td>
                             </tr>
                         </tbody>
