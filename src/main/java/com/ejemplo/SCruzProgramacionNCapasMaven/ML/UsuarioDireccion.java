@@ -8,6 +8,7 @@ public class UsuarioDireccion {
     public Direccion Direccion;
 //    @Valid
     public Usuario Usuario;
+    
     public List<Direccion> Direcciones;
 
     public Direccion getDireccion() {

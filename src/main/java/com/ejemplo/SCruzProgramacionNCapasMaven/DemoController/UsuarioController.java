@@ -7,6 +7,7 @@ import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.MunicipioDAOImplemeentation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.PaisDAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.RollDAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.UsuarioDAOImplementation;
+import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.UsuarioJPADAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Colonia;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Direccion;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Result;
@@ -75,10 +76,13 @@ public class UsuarioController {
     @Autowired
     private DireccionDAOImplementation direccionDAOImplementation;
 
+    @Autowired
+    private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
+
     @GetMapping
     public String Index(Model model) {
 
-        Result result = usuarioDAOImplementation.GetAll();
+        Result result = usuarioJPADAOImplementation.GetAll();
 
         if (result.correct) {
             model.addAttribute("usuarioDireccion", result.objects);
@@ -180,14 +184,15 @@ public class UsuarioController {
 
         Result result = new Result();
         if (usuarioDireccion.Usuario.getIdUsuario() == 0) { // agregar usuario
-            result = usuarioDAOImplementation.Add(usuarioDireccion);
+            result = usuarioJPADAOImplementation.Add(usuarioDireccion);
         } else {
             if (usuarioDireccion.Direccion.getIdDireccion() == 0) { //agregar direccion
+                result = usuarioDAOImplementation.AddDireccion(usuarioDireccion);
 
             } else if (usuarioDireccion.Direccion.getIdDireccion() == -1) { //editar usuario
-                result = usuarioDAOImplementation.UpdateUsuario(usuarioDireccion.Usuario);
+                result = usuarioJPADAOImplementation.UpdateUsario(usuarioDireccion);
             } else {
-                result = usuarioDAOImplementation.UpdateDireccion(usuarioDireccion.Direccion); //editar direccion
+                result = usuarioJPADAOImplementation.UpdateDireccion(usuarioDireccion); //editar direccion
             }
         }
 
@@ -480,7 +485,7 @@ public class UsuarioController {
 
     @GetMapping("/delete/{idUsuario}")
     public String DeleteUsuario(@PathVariable int idUsuario, RedirectAttributes redirectAttrs) {
-        Result result = usuarioDAOImplementation.DeleteUsuario(idUsuario); // eliminación física
+        Result result = usuarioJPADAOImplementation.DeleteUsuario(idUsuario); // eliminación física
 
         if (result.correct) {
             redirectAttrs.addFlashAttribute("mensaje", "Usuario eliminado exitosamente.");
@@ -493,7 +498,7 @@ public class UsuarioController {
 
     @GetMapping("/deletedireccion")
     public String DeleteDireccion(@RequestParam int idDireccion, @RequestParam int idUsuario, RedirectAttributes redirectAttrs) {
-        Result result = usuarioDAOImplementation.DeleteDireccion(idDireccion); // eliminación física
+        Result result = usuarioJPADAOImplementation.DeleteDireccion(idDireccion); // eliminación física
 
         if (result.correct) {
             redirectAttrs.addFlashAttribute("mensaje", "Dirección eliminada correctamente.");
@@ -502,6 +507,12 @@ public class UsuarioController {
         }
 
         return "redirect:/usuario/form/" + idUsuario;
+    }
+
+    @PostMapping("Activo")
+    @ResponseBody
+    public Result ActivoUsuario(@RequestParam int idUsuario, @RequestParam int Estatus) {
+        return usuarioDAOImplementation.UpdateActivo(idUsuario, Estatus);
     }
 
 }

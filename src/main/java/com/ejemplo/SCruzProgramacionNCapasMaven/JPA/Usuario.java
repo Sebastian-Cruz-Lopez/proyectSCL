@@ -1,63 +1,85 @@
-package com.ejemplo.SCruzProgramacionNCapasMaven.ML;
+package com.ejemplo.SCruzProgramacionNCapasMaven.JPA;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.util.Date;
+import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 
+@Entity
 public class Usuario {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idusuario")
     private int idUsuario;
-//    @NotBlank(message = "Ingresa tu nombre")
-//    @Size(min = 3, max = 15, message = "El Nombre debe tener entre 3 y 15 caracteres")
-//    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$", message = "El nombre solo debe contener letras y espacios")
+
+    @Column(name = "nombre")
     private String Nombre;
 
-//    @NotBlank(message = "Ingresa tu apellido paterno")
-//    @Size(min = 3, max = 15, message = "El Apellido Paterno debe tener entre 3 y 15 caracteres")
-//    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$", message = "El apellido Paterno solo debe contener letras y espacios")
+    @Column(name = "apellidopaterno")
     private String ApellidoPaterno;
 
-//    @NotBlank(message = "Ingresa tu apellido paterno")
-//    @Size(min = 3, max = 15, message = "El Apellido Paterno debe tener entre 3 y 15 caracteres")
-//    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$", message = "El apellido Materno solo debe contener letras y espacios")
+    @Column(name = "apellidomaterno")
     private String ApellidoMaterno;
 
-//    @NotEmpty(message = "Ingresa la fecha de nacimiento")
-//    @Past(message = "La Fecha de Nacimiento debe ser anterior a la fecha actual")
+    @Column(name = "fechanacimiento")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date FechaNacimiento;
 
-//    @NotBlank(message = "Ingresa tu Telefono")
-//    @Pattern(regexp = "^\\d{10}$", message = "El Teléfono debe tener exactamente 10 dígitos")
+    @Column(name = "telefono")
     private String Telefono;
 
-//    @NotBlank(message = "Ingresa tu Email")
-//    @Pattern(regexp = "[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,5}", message = "correo invalido regex")
+    @Column(name = "email")
     private String Email;
 
+    @Column(name = "username")
     private String Username;
 
+    @Column(name = "password")
     private String Password;
 
+    @Column(name = "sexo")
     private char Sexo;
 
-//    @NotBlank(message = "Ingresa tu Celular")
-//    @Pattern(regexp = "^\\d{10}$", message = "El Celular debe tener exactamente 10 dígitos")
+    @Column(name = "celular")
     private String Celular;
 
+    @Column(name = "curp")
     private String CURP;
 
+    @JoinColumn(name = "idroll")
+    @ManyToOne
     public Roll Roll;
-    
+
+    @Lob
+    @Column(name = "imagen")
     private String Imagen;
-    
+
+    @Column(name = "estatus")
     private int Estatus;
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<Direccion> direcciones;
+
+    public List<Direccion> getDirecciones() {
+        return direcciones;
+    }
+
+    public void setDirecciones(List<Direccion> direcciones) {
+        this.direcciones = direcciones;
+    }
     
-    public UsuarioDireccion UsuarioDireccion;
+    
 
     public int getIdUsuario() {
         return idUsuario;
@@ -163,14 +185,6 @@ public class Usuario {
         this.Username = Username;
     }
 
-    public UsuarioDireccion getUsuarioDireccion() {
-        return UsuarioDireccion;
-    }
-
-    public void setUsuarioDireccion(UsuarioDireccion UsuarioDireccion) {
-        this.UsuarioDireccion = UsuarioDireccion;
-    }
-
     public String getImagen() {
         return Imagen;
     }
@@ -186,9 +200,5 @@ public class Usuario {
     public void setEstatus(int Estatus) {
         this.Estatus = Estatus;
     }
-
-    
-    
-    
 
 }

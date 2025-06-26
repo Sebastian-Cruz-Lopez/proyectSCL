@@ -22,5 +22,9 @@ public interface IUsuarioDAO {
     Result DeleteUsuario(int idUsuario);
     
     Result DeleteDireccion(int idDireccion);
+    
+    Result UpdateActivo(int idUsuario, int Estatus);
+    
+    Result AddDireccion(UsuarioDireccion usuarioDireccion);
 
 }
