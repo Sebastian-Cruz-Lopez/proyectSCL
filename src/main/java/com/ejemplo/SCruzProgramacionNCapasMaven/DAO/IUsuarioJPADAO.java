@@ -16,8 +16,12 @@ public interface IUsuarioJPADAO {
     
     Result UpdateDireccion(UsuarioDireccion usuarioDireccion);
     
-    //pendiente AGREGAR DIRECCION
+    Result AddDireccion(UsuarioDireccion usuarioDireccion);
     
     Result GetAll();
+    
+    Result GetByid(int idUsuario);
+    
+    Result GetDireccionByid(int idDireccion);
 
 }

@@ -3,6 +3,7 @@ package com.ejemplo.SCruzProgramacionNCapasMaven.DemoController;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.ColoniaDAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.DireccionDAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.EstadoDAOImplementation;
+import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.GetJPADAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.MunicipioDAOImplemeentation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.PaisDAOImplementation;
 import com.ejemplo.SCruzProgramacionNCapasMaven.DAO.RollDAOImplementation;
@@ -15,12 +16,16 @@ import com.ejemplo.SCruzProgramacionNCapasMaven.ML.ResultValidaDatos;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Roll;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Usuario;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.UsuarioDireccion;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +43,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -79,6 +85,9 @@ public class UsuarioController {
     @Autowired
     private UsuarioJPADAOImplementation usuarioJPADAOImplementation;
 
+    @Autowired
+    private GetJPADAOImplementation getJPADAOImplementation;
+
     @GetMapping
     public String Index(Model model) {
 
@@ -87,7 +96,7 @@ public class UsuarioController {
         if (result.correct) {
             model.addAttribute("usuarioDireccion", result.objects);
             model.addAttribute("usuario", new Usuario());
-            model.addAttribute("rolls", rollDAOImplementation.GetAll().objects);
+            model.addAttribute("rolls", getJPADAOImplementation.GetRoll().objects);
         }
 
         return "UsuarioIndex";
@@ -99,7 +108,7 @@ public class UsuarioController {
         model.addAttribute("usuario", new Usuario());
 
         model.addAttribute("usuarioDireccion", result.objects);
-        model.addAttribute("rolls", rollDAOImplementation.GetAll().objects);
+        model.addAttribute("rolls", getJPADAOImplementation.GetRoll().objects);
 
         return "UsuarioIndex";
     }
@@ -109,12 +118,12 @@ public class UsuarioController {
 
         if (idUsuario < 1) {
             // Vista para agregar usuario nuevo
-            model.addAttribute("paises", paisDAOImplementation.GetAll().objects);
-            model.addAttribute("rolls", rollDAOImplementation.GetAll().objects);
+            model.addAttribute("paises", getJPADAOImplementation.GetPais().objects);
+            model.addAttribute("rolls", getJPADAOImplementation.GetRoll().objects);
             model.addAttribute("usuarioDireccion", new UsuarioDireccion());
             return "UsuarioForm";
         } else {
-            model.addAttribute("usuarioDireccion", usuarioDAOImplementation.UsuarioGetByid(idUsuario).object);
+            model.addAttribute("usuarioDireccion", usuarioJPADAOImplementation.GetByid(idUsuario).object);
             return "UsuarioDetail";
         }
 
@@ -127,13 +136,13 @@ public class UsuarioController {
 
             UsuarioDireccion usuarioDireccion = new UsuarioDireccion();
 
-            usuarioDireccion = (UsuarioDireccion) usuarioDAOImplementation.UsuarioGetByid(idUsuario).object;
+            usuarioDireccion = (UsuarioDireccion) usuarioJPADAOImplementation.GetByid(idUsuario).object;
             usuarioDireccion.Direccion = new Direccion();
             usuarioDireccion.Direccion.setIdDireccion(-1);
             model.addAttribute("usuarioDireccion", usuarioDireccion);
 
             //model.addAttribute("usuarioDireccion", usuarioDireccion);
-            model.addAttribute("rolls", rollDAOImplementation.GetAll().objects);
+            model.addAttribute("rolls", getJPADAOImplementation.GetRoll().objects);
 
         } else if (idDireccion == 0) { //AGREGAR DIRECCION
 
@@ -143,21 +152,21 @@ public class UsuarioController {
             usuarioDireccion.Direccion = new Direccion();
             usuarioDireccion.Direccion.setIdDireccion(0);
             model.addAttribute("usuarioDireccion", usuarioDireccion);
-            model.addAttribute("paises", paisDAOImplementation.GetAll().objects);
+            model.addAttribute("paises", getJPADAOImplementation.GetPais().objects);
 
         } else { //EDITAR DIRECCION
             UsuarioDireccion usuarioDireccion = new UsuarioDireccion();
             usuarioDireccion.Direccion = new Direccion();
-            usuarioDireccion.Direccion = (Direccion) direccionDAOImplementation.DireccionByid(idDireccion).object;
+            usuarioDireccion.Direccion = (Direccion) usuarioJPADAOImplementation.GetDireccionByid(idDireccion).object;
             usuarioDireccion.Usuario = new Usuario();
             usuarioDireccion.Usuario.setIdUsuario(idUsuario);
             //usuarioDireccion.Direccion = direccion;
             model.addAttribute("usuarioDireccion", usuarioDireccion);
             //model.addAttribute("direccion", direccion);
-            model.addAttribute("paises", paisDAOImplementation.GetAll().objects);
-            model.addAttribute("estados", estadoDAOImplementation.GetEstadosByPais(usuarioDireccion.Direccion.Colonia.Municipio.Estado.getIdEstado()).objects);
-            model.addAttribute("municipios", municipioDAOImplementation.GetMunicipiosByEstado(usuarioDireccion.Direccion.Colonia.Municipio.getIdMunicipio()).objects);
-            model.addAttribute("colonias", coloniaDAOImplementation.GetColoniasByMunicipio(usuarioDireccion.Direccion.Colonia.getIdColonia()).objects);
+            model.addAttribute("paises", getJPADAOImplementation.GetPais().objects);
+            model.addAttribute("estados", getJPADAOImplementation.GetEstado(usuarioDireccion.Direccion.Colonia.Municipio.Estado.getIdEstado()).objects);
+            model.addAttribute("municipios", getJPADAOImplementation.GetMunicipio(usuarioDireccion.Direccion.Colonia.Municipio.getIdMunicipio()).objects);
+            model.addAttribute("colonias", getJPADAOImplementation.GetColonia(usuarioDireccion.Direccion.Colonia.getIdColonia()).objects);
 
         }
         return "UsuarioForm";
@@ -187,7 +196,7 @@ public class UsuarioController {
             result = usuarioJPADAOImplementation.Add(usuarioDireccion);
         } else {
             if (usuarioDireccion.Direccion.getIdDireccion() == 0) { //agregar direccion
-                result = usuarioDAOImplementation.AddDireccion(usuarioDireccion);
+                result = usuarioJPADAOImplementation.AddDireccion(usuarioDireccion);
 
             } else if (usuarioDireccion.Direccion.getIdDireccion() == -1) { //editar usuario
                 result = usuarioJPADAOImplementation.UpdateUsario(usuarioDireccion);
@@ -210,34 +219,69 @@ public class UsuarioController {
     }
 
     @PostMapping("cargamasiva")
-    public String CargaMasiva(@RequestParam MultipartFile archivo, Model model) throws IOException {
+    public String cargaMasiva(@RequestParam MultipartFile archivo, Model model, HttpSession session) throws IOException {
+
         if (archivo != null && !archivo.isEmpty()) {
-            String extension = archivo.getOriginalFilename().split("\\.")[1];
-
-            List<UsuarioDireccion> usuariosDireccion = new ArrayList<>();
-            if (extension.equalsIgnoreCase("txt")) {
-                usuariosDireccion = LecturaArchivoTXT(archivo);
-            } else if (extension.equalsIgnoreCase("xlsx")) {
-                usuariosDireccion = LecturaArchivoXLSX(archivo);
-            }
-
-            // Validar datos
-            List<ResultValidaDatos> errores = ValidarDatos(usuariosDireccion);
-            if (!errores.isEmpty()) {
-                model.addAttribute("listaErrores", errores);
-                model.addAttribute("hayErrores", true);
-                return "cargamasiva";
-            }
+            String fileExtention = archivo.getOriginalFilename().split("\\.")[1];
 
             String root = System.getProperty("user.dir");
             String path = "src/main/resources/archivos";
             String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            String nombreArchivo = fecha + "_" + archivo.getOriginalFilename();
-            File destino = new File(root + "/" + path + "/" + nombreArchivo);
-            destino.getParentFile().mkdirs();
-            archivo.transferTo(destino);
+            String absolutePath = root + "/" + path + "/" + fecha + archivo.getOriginalFilename();
+
+            List<UsuarioDireccion> usuariosDireccion = new ArrayList<>();
+
+            if (fileExtention.equals("txt")) {
+                usuariosDireccion = LecturaArchivoTXT(archivo);
+                archivo.transferTo(new File(absolutePath));
+            } else { //"xlsx"
+                archivo.transferTo(new File(absolutePath));
+                usuariosDireccion = LecturaArchivoXLSX((MultipartFile) new File(absolutePath));
+            }
+
+            List<ResultValidaDatos> listaErrores = ValidarDatos(usuariosDireccion);
+            if (listaErrores.isEmpty()) {
+                session.setAttribute("path", absolutePath);
+                model.addAttribute("listaErrores", listaErrores);
+                model.addAttribute("archivoCorrecto", true);
+                return "redirect:/usuario/cargamasiva/Procesar";
+            } else {
+                model.addAttribute("listaErrores", listaErrores);
+                model.addAttribute("archivoCorrecto", false);
+            }
         }
         return "cargamasiva";
+    }
+
+    @GetMapping("/cargamasiva/Procesar")
+    public String ProcesarCargaMasiva(HttpSession session, Model model) throws FileNotFoundException, IOException {
+
+        String ruta = session.getAttribute("path").toString();
+        if (ruta != null && !ruta.isEmpty()) {
+            String fileExtention = ruta.split("\\.")[1];
+
+            List<UsuarioDireccion> usuariosDireccion = new ArrayList<>();
+
+            if (fileExtention.equals("txt")) {
+                MultipartFile multipartFile = convertFileToMultipartFile(new File(ruta));
+                usuariosDireccion = LecturaArchivoTXT(multipartFile);
+            } else {
+                usuariosDireccion = LecturaArchivoXLSX((MultipartFile) new File(ruta));
+            }
+
+            List<ResultValidaDatos> listaErrores = ValidarDatos(usuariosDireccion);
+            if (listaErrores.isEmpty()) {
+                model.addAttribute("usuariosDireccion", usuarioDAOImplementation.Add(usuariosDireccion).objects);
+//                model.addAttribute("usuariosDireccion", usuarioJPADAOImplementation.Add(usuariosDireccion).objects);
+                return "redirect:/usuario/index";
+            } else {
+                model.addAttribute("listaErrores", listaErrores);
+                model.addAttribute("archivoCorrecto", false);
+            }
+        }
+        session.removeAttribute("path");
+
+        return "redirect:/usuario/cargamasiva";
     }
 
     public List<UsuarioDireccion> LecturaArchivoXLSX(MultipartFile archivo) {
@@ -447,6 +491,22 @@ public class UsuarioController {
         return listaErrores;
     }
 
+    public static MultipartFile convertFileToMultipartFile(File file) throws IOException {
+        return convertFileToMultipartFile(file, "file");
+    }
+
+    public static MultipartFile convertFileToMultipartFile(File file, String paramName) throws IOException {
+        String contentType = Files.probeContentType(file.toPath());
+        try (FileInputStream input = new FileInputStream(file)) {
+            return new MockMultipartFile(
+                    paramName,
+                    file.getName(),
+                    contentType,
+                    input
+            );
+        }
+    }
+
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return email.matches(emailRegex);
@@ -465,7 +525,7 @@ public class UsuarioController {
     @ResponseBody
     public Result GetEstadosByPais(@PathVariable("idPais") int idPais) {
 
-        return estadoDAOImplementation.GetEstadosByPais(idPais);
+        return getJPADAOImplementation.GetEstado(idPais);
 
     }
 
@@ -473,14 +533,14 @@ public class UsuarioController {
     @ResponseBody
     public Result GetMunicipiosByEstado(@PathVariable("idEstado") int idEstado) {
 
-        return municipioDAOImplementation.GetMunicipiosByEstado(idEstado);
+        return getJPADAOImplementation.GetMunicipio(idEstado);
     }
 
     @GetMapping("/GetColoniasByMunicipio/{idMunicipio}")
     @ResponseBody
     public Result GetColoniasByMunicipio(@PathVariable("idMunicipio") int idMunicipio) {
 
-        return coloniaDAOImplementation.GetColoniasByMunicipio(idMunicipio);
+        return getJPADAOImplementation.GetColonia(idMunicipio);
     }
 
     @GetMapping("/delete/{idUsuario}")
@@ -515,4 +575,10 @@ public class UsuarioController {
         return usuarioDAOImplementation.UpdateActivo(idUsuario, Estatus);
     }
 
+//    @GetMapping("usuario/form/GetColoniaByCP/{CodigoPostal}")
+//    @ResponseBody
+//    public Result GetColoniaByCP(@PathVariable("CodigoPostal") String codigoPostal) {
+//        return getJPADAOImplementation.GetColoniaByCP(codigoPostal);
+//    }
+  
 }

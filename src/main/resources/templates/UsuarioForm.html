@@ -224,7 +224,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label for="codigopostal" class="form-label">Código Postal</label>
-                                        <input type="text" class="form-control" id="codigopostal" readonly th:field="*{direccion.Colonia.CodigoPostal}">
+                                        <input type="text" class="form-control" id="codigopostal" th:field="*{direccion.Colonia.CodigoPostal}">
                                     </div>
                                 </div>
 
@@ -565,6 +565,74 @@
                                 }
                             });
                         </script>-->
+
+<!--            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const inputCP = document.getElementById("codigopostal");
+
+                    inputCP.addEventListener("blur", function () {
+                        const cp = inputCP.value.trim();
+
+                        if (cp.length === 5) {
+                            fetch(`/GetColoniasByCP/${cp}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        const colonias = data.objects;
+
+                                        const ddlColonia = document.getElementById("ddlcolonia");
+                                        const ddlMunicipio = document.getElementById("ddlmunicipio");
+                                        const ddlEstado = document.getElementById("ddlestado");
+                                        const ddlPais = document.getElementById("ddlpais");
+
+                                        
+                                        if (colonias.length > 0) {
+                                            colonias.forEach(c => {
+                                                const option = document.createElement("option");
+                                                option.value = c.idColonia;
+                                                option.text = c.nombre;
+                                                ddlColonia.appendChild(option);
+                                            });
+
+                                            const ref = colonias[0];
+
+                                            const municipioOption = document.createElement("option");
+                                            municipioOption.value = ref.municipio.idMunicipio;
+                                            municipioOption.text = ref.municipio.nombre;
+                                            ddlMunicipio.appendChild(municipioOption);
+
+                                            const estadoOption = document.createElement("option");
+                                            estadoOption.value = ref.municipio.estado.idEstado;
+                                            estadoOption.text = ref.municipio.estado.nombre;
+                                            ddlEstado.appendChild(estadoOption);
+
+                                            const paisOption = document.createElement("option");
+                                            paisOption.value = ref.municipio.estado.pais.idPais;
+                                            paisOption.text = ref.municipio.estado.pais.nombre;
+                                            ddlPais.appendChild(paisOption);
+
+                                            ddlColonia.value = ref.idColonia;
+                                            ddlColonia.dispatchEvent(new Event('change'));
+
+                                            ddlMunicipio.value = ref.municipio.idMunicipio;
+                                            ddlMunicipio.dispatchEvent(new Event('change'));
+
+                                            ddlEstado.value = ref.municipio.estado.idEstado;
+                                            ddlEstado.dispatchEvent(new Event('change'));
+
+                                            ddlPais.value = ref.municipio.estado.pais.idPais;
+                                            ddlPais.dispatchEvent(new Event('change'));
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error("Error al obtener colonias por CP:", err);
+                                    });
+                        }
+                    });
+                });
+            </script>-->
+
+
+
 
     </body>
 </html>

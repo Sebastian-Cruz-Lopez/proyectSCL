@@ -12,6 +12,7 @@ import com.ejemplo.SCruzProgramacionNCapasMaven.ML.UsuarioDireccion;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -140,12 +141,15 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
                 callableStatement.setString(9, String.valueOf(usuarioDireccion.Usuario.getSexo()));
                 callableStatement.setString(10, usuarioDireccion.Usuario.getCelular());
                 callableStatement.setString(11, usuarioDireccion.Usuario.getCURP());
+                usuarioDireccion.Usuario.Roll = new Roll();
                 callableStatement.setInt(12, usuarioDireccion.Usuario.Roll.getIdRoll());
                 callableStatement.setString(13, usuarioDireccion.Usuario.getImagen());
                 callableStatement.setInt(14, usuarioDireccion.Usuario.getEstatus());
+                usuarioDireccion.Direccion = new Direccion();
                 callableStatement.setString(15, usuarioDireccion.Direccion.getCalle());
                 callableStatement.setString(16, usuarioDireccion.Direccion.getNumeroInterior());
                 callableStatement.setString(17, usuarioDireccion.Direccion.getNumeroExterior());
+                usuarioDireccion.Direccion.Colonia = new Colonia();
                 callableStatement.setInt(18, usuarioDireccion.Direccion.Colonia.getIdColonia());
 
                 int rowAffected = callableStatement.executeUpdate();
@@ -162,6 +166,26 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
 
         }
 
+        return result;
+    }
+    
+    @Override
+    public Result Add(List<UsuarioDireccion> usuariosDireccion){
+        Result result = new Result();
+        
+        try {
+            for (UsuarioDireccion usuarioDireccion : usuariosDireccion) {
+                this.Add(usuarioDireccion);
+            }
+            
+            result.correct = true;
+            
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+        
         return result;
     }
 

@@ -4,12 +4,15 @@ import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Direccion;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Result;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Usuario;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.UsuarioDireccion;
+import java.util.List;
 
 public interface IUsuarioDAO {
 
     Result GetAll();
 
     Result Add(UsuarioDireccion usuarioDireccion);
+    
+    Result Add(List<UsuarioDireccion> usuariosDireccion);
 
     Result UsuarioGetByid(int idUsuario);
 

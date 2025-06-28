@@ -233,6 +233,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPADAO {
 
                 usuarioDireccion.Usuario.Roll = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Roll();
                 usuarioDireccion.Usuario.Roll.setIdRoll(usuarioJPA.Roll.getIdRoll());
+                usuarioDireccion.Usuario.Roll.setRoll(usuarioJPA.Roll.getRoll());
                 usuarioDireccion.Usuario.setImagen(usuarioJPA.getImagen());
                 usuarioDireccion.Usuario.setEstatus(usuarioJPA.getEstatus());
 
@@ -267,6 +268,171 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPADAO {
         } catch (Exception ex) {
             result.correct = false;
             result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
+    @Override
+    public Result GetByid(int idUsuario) {
+        Result result = new Result();
+
+        try {
+            Usuario usuarioJPA = entityManager.find(Usuario.class, idUsuario);
+
+            if (usuarioJPA == null) {
+                result.correct = false;
+                result.errorMessage = "Usuario no encontrado con el ID: " + idUsuario;
+                return result;
+            }
+
+            usuarioJPA.getDirecciones().size();
+
+            UsuarioDireccion usuarioDireccion = new UsuarioDireccion();
+            usuarioDireccion.Usuario = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Usuario();
+
+            usuarioDireccion.Usuario.setIdUsuario(usuarioJPA.getIdUsuario());
+            usuarioDireccion.Usuario.setNombre(usuarioJPA.getNombre());
+            usuarioDireccion.Usuario.setApellidoPaterno(usuarioJPA.getApellidoPaterno());
+            usuarioDireccion.Usuario.setApellidoMaterno(usuarioJPA.getApellidoMaterno());
+            usuarioDireccion.Usuario.setFechaNacimiento(usuarioJPA.getFechaNacimiento());
+            usuarioDireccion.Usuario.setTelefono(usuarioJPA.getTelefono());
+            usuarioDireccion.Usuario.setEmail(usuarioJPA.getEmail());
+            usuarioDireccion.Usuario.setUsername(usuarioJPA.getUsername());
+            usuarioDireccion.Usuario.setPassword(usuarioJPA.getPassword());
+            usuarioDireccion.Usuario.setSexo(usuarioJPA.getSexo());
+            usuarioDireccion.Usuario.setCelular(usuarioJPA.getCelular());
+            usuarioDireccion.Usuario.setCURP(usuarioJPA.getCURP());
+            usuarioDireccion.Usuario.setImagen(usuarioJPA.getImagen());
+            usuarioDireccion.Usuario.setEstatus(usuarioJPA.getEstatus());
+
+            usuarioDireccion.Usuario.Roll = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Roll();
+            usuarioDireccion.Usuario.Roll.setIdRoll(usuarioJPA.getRoll().getIdRoll());
+            usuarioDireccion.Usuario.Roll.setRoll(usuarioJPA.getRoll().getRoll());
+
+            usuarioDireccion.Direcciones = new ArrayList<>();
+
+            for (com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Direccion direccionJPA : usuarioJPA.getDirecciones()) {
+                com.ejemplo.SCruzProgramacionNCapasMaven.ML.Direccion direccion = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Direccion();
+
+                direccion.setIdDireccion(direccionJPA.getIdDireccion());
+                direccion.setCalle(direccionJPA.getCalle());
+                direccion.setNumeroInterior(direccionJPA.getNumeroInterior());
+                direccion.setNumeroExterior(direccionJPA.getNumeroExterior());
+
+                direccion.Colonia = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Colonia();
+                direccion.Colonia.setIdColonia(direccionJPA.Colonia.getIdColonia());
+                direccion.Colonia.setNombre(direccionJPA.Colonia.getNombre());
+                direccion.Colonia.setCodigoPostal(direccionJPA.Colonia.getCodigoPostal());
+
+                direccion.Colonia.Municipio = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Municipio();
+                direccion.Colonia.Municipio.setIdMunicipio(direccionJPA.Colonia.Municipio.getIdMunicipio());
+                direccion.Colonia.Municipio.setNombre(direccionJPA.Colonia.Municipio.getNombre());
+
+                direccion.Colonia.Municipio.Estado = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Estado();
+                direccion.Colonia.Municipio.Estado.setIdEstado(direccionJPA.Colonia.Municipio.Estado.getIdEstado());
+                direccion.Colonia.Municipio.Estado.setNombre(direccionJPA.Colonia.Municipio.Estado.getNombre());
+
+                direccion.Colonia.Municipio.Estado.Pais = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Pais();
+                direccion.Colonia.Municipio.Estado.Pais.setIdPais(direccionJPA.Colonia.Municipio.Estado.Pais.getIdPais());
+                direccion.Colonia.Municipio.Estado.Pais.setNombre(direccionJPA.Colonia.Municipio.Estado.Pais.getNombre());
+
+                usuarioDireccion.Direcciones.add(direccion);
+            }
+
+            result.correct = true;
+            result.object = usuarioDireccion;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
+    @Transactional
+    @Override
+    public Result AddDireccion(UsuarioDireccion usuarioDireccion) {
+        Result result = new Result();
+
+        try {
+            Direccion direccionJPA = new Direccion();
+
+            direccionJPA.setCalle(usuarioDireccion.Direccion.getCalle());
+            direccionJPA.setNumeroInterior(usuarioDireccion.Direccion.getNumeroInterior());
+            direccionJPA.setNumeroExterior(usuarioDireccion.Direccion.getNumeroExterior());
+
+            Colonia coloniaJPA = new Colonia();
+            coloniaJPA.setIdColonia(usuarioDireccion.Direccion.Colonia.getIdColonia());
+            direccionJPA.setColonia(coloniaJPA);
+
+            Usuario usuarioJPA = new Usuario();
+            usuarioJPA.setIdUsuario(usuarioDireccion.Usuario.getIdUsuario());
+            direccionJPA.setUsuario(usuarioJPA);
+
+            entityManager.persist(direccionJPA);
+            entityManager.flush();
+
+            result.correct = true;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getLocalizedMessage();
+            result.ex = ex;
+        }
+
+        return result;
+    }
+
+    @Override
+    public Result GetDireccionByid(int idDireccion) {
+        Result result = new Result();
+
+        try {
+            Direccion direccionEntity = entityManager.createQuery(
+                    "SELECT d FROM Direccion d "
+                    + "JOIN FETCH d.Colonia c "
+                    + "JOIN FETCH c.Municipio m "
+                    + "JOIN FETCH m.Estado e "
+                    + "JOIN FETCH e.Pais p "
+                    + "WHERE d.idDireccion = :idDireccion", Direccion.class)
+                    .setParameter("idDireccion", idDireccion)
+                    .getSingleResult();
+
+            com.ejemplo.SCruzProgramacionNCapasMaven.ML.Direccion direccionML = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Direccion();
+
+            direccionML.setIdDireccion(direccionEntity.getIdDireccion());
+            direccionML.setCalle(direccionEntity.getCalle());
+            direccionML.setNumeroInterior(direccionEntity.getNumeroInterior());
+            direccionML.setNumeroExterior(direccionEntity.getNumeroExterior());
+
+            direccionML.Colonia = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Colonia();
+            direccionML.Colonia.setIdColonia(direccionEntity.Colonia.getIdColonia());
+            direccionML.Colonia.setNombre(direccionEntity.Colonia.getNombre());
+            direccionML.Colonia.setCodigoPostal(direccionEntity.Colonia.getCodigoPostal());
+
+            direccionML.Colonia.Municipio = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Municipio();
+            direccionML.Colonia.Municipio.setIdMunicipio(direccionEntity.Colonia.Municipio.getIdMunicipio());
+            direccionML.Colonia.Municipio.setNombre(direccionEntity.Colonia.Municipio.getNombre());
+
+            direccionML.Colonia.Municipio.Estado = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Estado();
+            direccionML.Colonia.Municipio.Estado.setIdEstado(direccionEntity.Colonia.Municipio.Estado.getIdEstado());
+            direccionML.Colonia.Municipio.Estado.setNombre(direccionEntity.Colonia.Municipio.Estado.getNombre());
+
+            direccionML.Colonia.Municipio.Estado.Pais = new com.ejemplo.SCruzProgramacionNCapasMaven.ML.Pais();
+            direccionML.Colonia.Municipio.Estado.Pais.setIdPais(direccionEntity.Colonia.Municipio.Estado.Pais.getIdPais());
+            direccionML.Colonia.Municipio.Estado.Pais.setNombre(direccionEntity.Colonia.Municipio.Estado.Pais.getNombre());
+
+            result.object = direccionML;
+            
+            result.correct = true;
+
+        } catch (Exception ex) {
+            result.correct = false;
+            result.errorMessage = ex.getMessage();
             result.ex = ex;
         }
 
