@@ -62,12 +62,12 @@
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <label class="form-check-label" id="Activo"> Estatus </label>
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" id="CheckActivo"
-                                                       th:checked="${usuarioDireccion.Usuario.Estatus == 1}">
-                                                <label class="form-check-label" for="CheckActivo"
-                                                       th:text="${usuarioDireccion.Usuario.Estatus == 1 ? 'Activo' : 'Inactivo'}"></label>
-                                            </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="CheckActivo"
+                                               th:checked="${usuarioDireccion.Usuario.Estatus == 1}">
+                                        <label class="form-check-label" for="CheckActivo"
+                                               th:text="${usuarioDireccion.Usuario.Estatus == 1 ? 'Activo' : 'Inactivo'}"></label>
+                                    </div>
                                 </td>
                                 <td>
                                     <img style="width: 70px"
@@ -98,31 +98,31 @@
 
         <script>
             $('#CheckActivo').change(function () {
-                if (this.checked) {
-                    $.ajax({
-                        url: '/usuario/Activo?idUsuario=' + $("#idUsuario").val() + "&Estatus=" + 1,
-                        type: 'POST',
-                        dataType: 'json',
-                        success: function () {
-                            $('#Activo').text('Activo');
-                        }, error: function () {
-                            alert("Ocurrio un error, intentalo mas tarde!");
-                            $("#CheckActivo").prop("checked", false);
-                        }
-                    });
-                } else {
-                    $.ajax({
-                        url: '/usuario/Activo?idUsuario=' + $("#idUsuario").val() + "&Estatus=" + 0,
-                        type: 'POST',
-                        dataType: 'json',
-                        success: function () {
-                            $('#Activo').text('Inactivo');
-                        }, error: function () {
-                            alert("Ocurrio un error, intentalo mas tarde!");
-                            $("#CheckActivo").prop("checked", true);
-                        }
-                    });
-                }
+            if (this.checked) {
+            $.ajax({
+            url: '/usuario/Activo?idUsuario=' + $("#idUsuario").val() + "&Estatus=" + 1,
+            type: 'POST',
+            dataType: 'json',
+            success: function () {
+            $('#Activo').text('Activo');
+            }, error: function () {
+            alert("Ocurrio un error, intentalo mas tarde!");
+            $("#CheckActivo").prop("checked", false);
+            }
+            });
+            } else {
+            $.ajax({
+            url: '/usuario/Activo?idUsuario=' + $("#idUsuario").val() + "&Estatus=" + 0,
+            type: 'POST',
+            dataType: 'json',
+            success: function () {
+            $('#Activo').text('Inactivo');
+            }, error: function () {
+            alert("Ocurrio un error, intentalo mas tarde!");
+            $("#CheckActivo").prop("checked", true);
+            }
+            });
+            }
             });
         </script>
     </body>

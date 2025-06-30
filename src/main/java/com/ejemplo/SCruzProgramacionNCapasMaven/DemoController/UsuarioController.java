@@ -271,9 +271,11 @@ public class UsuarioController {
 
             List<ResultValidaDatos> listaErrores = ValidarDatos(usuariosDireccion);
             if (listaErrores.isEmpty()) {
-                model.addAttribute("usuariosDireccion", usuarioDAOImplementation.Add(usuariosDireccion).objects);
-//                model.addAttribute("usuariosDireccion", usuarioJPADAOImplementation.Add(usuariosDireccion).objects);
-                return "redirect:/usuario/index";
+                for (UsuarioDireccion usuarioDireccion : usuariosDireccion) {
+                    usuarioJPADAOImplementation.Add(usuarioDireccion);
+//                      usuarioDAOImplementation.Add(usuariosDireccion);
+                }
+                return "redirect:/usuario";
             } else {
                 model.addAttribute("listaErrores", listaErrores);
                 model.addAttribute("archivoCorrecto", false);
@@ -404,10 +406,21 @@ public class UsuarioController {
 
                 Roll roll = new Roll();
                 roll.setIdRoll(Integer.parseInt(datos[12]));
+                usuarioDireccion.Usuario.setRoll(roll);
+
                 usuarioDireccion.Usuario.setImagen(datos[13]);
+                usuarioDireccion.Usuario.setEstatus(Integer.parseInt(datos[14]));
+
+                Direccion direccion = new Direccion();
+                direccion.setCalle(datos[15]);
+                direccion.setNumeroInterior(datos[16]);
+                direccion.setNumeroExterior(datos[17]);
+                Colonia colonia = new Colonia();
+                colonia.setIdColonia(Integer.parseInt(datos[18]));
+                direccion.setColonia(colonia);
+                usuarioDireccion.setDireccion(direccion);
 
                 usuariosDireccion.add(usuarioDireccion);
-
             }
 
         } catch (Exception ex) {
@@ -580,5 +593,4 @@ public class UsuarioController {
 //    public Result GetColoniaByCP(@PathVariable("CodigoPostal") String codigoPostal) {
 //        return getJPADAOImplementation.GetColoniaByCP(codigoPostal);
 //    }
-  
 }

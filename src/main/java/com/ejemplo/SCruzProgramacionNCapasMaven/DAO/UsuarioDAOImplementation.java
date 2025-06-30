@@ -142,7 +142,7 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
                 callableStatement.setString(10, usuarioDireccion.Usuario.getCelular());
                 callableStatement.setString(11, usuarioDireccion.Usuario.getCURP());
                 usuarioDireccion.Usuario.Roll = new Roll();
-                callableStatement.setInt(12, usuarioDireccion.Usuario.Roll.getIdRoll());
+                callableStatement.setInt(12, usuarioDireccion.Usuario.getRoll().getIdRoll());
                 callableStatement.setString(13, usuarioDireccion.Usuario.getImagen());
                 callableStatement.setInt(14, usuarioDireccion.Usuario.getEstatus());
                 usuarioDireccion.Direccion = new Direccion();
