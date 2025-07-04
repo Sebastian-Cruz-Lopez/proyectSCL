@@ -6,17 +6,17 @@
         <div class="container text-center mt-5">
 
             <!-- CONTENEDOR DE BÚSQUEDA -->
-            <div class="mx-auto p-4 border rounded bg-light mb-4" style="max-width: 2100px;">
+            <div class="mx-auto p-3 border rounded bg-light mb-3 " style="max-width: 2100px;">
                 <form method="post" th:action="@{/usuario}" th:object="${usuario}">
                     <h5 class="mb-3">Buscar Usuario</h5>
-                    <div class="row justify-content-center g-3">
-                        <div class="col-md-3">
+                    <div class="row justify-content-center g-4">
+                        <div class="col-md-2">
                             <input type="text" class="form-control" placeholder="Nombre" name="nombre">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <input type="text" class="form-control" placeholder="Apellido Paterno" name="apellidoPaterno">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <input type="text" class="form-control" placeholder="Apellido Materno" name="apellidoMaterno">
                         </div>
                         <div class="col-md-2">
@@ -24,6 +24,14 @@
                                 <option value=0 selected>Selecciona el Roll</option>
                                 <option th:each="roll : ${rolls}" th:value="${roll.idRoll}" th:text="${roll.Roll}" ></option>
                             </select>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-left ms-5">
+                            <input type="hidden" name="estatus" id="estatusInput" value="0">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="estatusSwitch" value="1">
+                                <label class="form-check-label" for="estatusSwitch">Estatus</label>
+                            </div>
+
                         </div>
                         <div class="col-md-3 d-grid gap-2 d-md-block">
                             <button type="submit" class="btn btn-outline-primary">
@@ -125,6 +133,35 @@
             }
             });
         </script>
+        <script>
+            document.getElementById('estatusSwitch').addEventListener('change', function() {
+            document.getElementById('estatusInput').value = this.checked ? '1' : '0';
+            });
+        </script>
+        <script>
+            const estatusSwitch = document.getElementById('estatusSwitch');
+            const estatusInput = document.getElementById('estatusInput');
+            const form = document.querySelector('form');
+
+            if (estatusSwitch && estatusInput) {
+            estatusSwitch.addEventListener('change', () => {
+            estatusInput.value = estatusSwitch.checked ? '1' : '0';
+            console.log('Switch cambiado. Nuevo valor estatus:', estatusInput.value);
+            });
+            }
+
+            form.addEventListener('submit', e => {
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const pair of formData.entries()) {
+            params.append(pair[0], pair[1]);
+            }
+            console.log('Datos que se enviarían:', params.toString());
+            // El formulario se envía normalmente luego del console.log
+            });
+        </script>
+
+
     </body>
 
 </html>

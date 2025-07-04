@@ -46,7 +46,7 @@ public class UsuarioJPADAOImplementation implements IUsuarioJPADAO {
             usuarioJPA.Roll.setIdRoll(usuarioDireccion.Usuario.Roll.getIdRoll());
             usuarioJPA.setImagen(usuarioDireccion.Usuario.getImagen());
             usuarioJPA.setEstatus(usuarioDireccion.Usuario.getEstatus());
-
+            
             entityManager.persist(usuarioJPA);
             entityManager.flush();
             Direccion direccion = new Direccion();

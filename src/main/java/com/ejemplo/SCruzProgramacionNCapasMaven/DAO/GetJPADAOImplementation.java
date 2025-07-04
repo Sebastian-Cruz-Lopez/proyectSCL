@@ -1,12 +1,20 @@
 package com.ejemplo.SCruzProgramacionNCapasMaven.DAO;
 
 import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Colonia;
+import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Direccion;
 import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Estado;
 import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Municipio;
 import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Pais;
 import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Roll;
+import com.ejemplo.SCruzProgramacionNCapasMaven.JPA.Usuario;
 import com.ejemplo.SCruzProgramacionNCapasMaven.ML.Result;
+import com.ejemplo.SCruzProgramacionNCapasMaven.ML.UsuarioDireccion;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

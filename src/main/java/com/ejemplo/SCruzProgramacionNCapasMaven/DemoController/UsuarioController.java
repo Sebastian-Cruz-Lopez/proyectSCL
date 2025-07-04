@@ -124,7 +124,7 @@ public class UsuarioController {
             return "UsuarioForm";
         } else {
             model.addAttribute("usuarioDireccion", usuarioJPADAOImplementation.GetByid(idUsuario).object);
-            
+
             return "UsuarioDetail";
         }
 
@@ -174,7 +174,7 @@ public class UsuarioController {
     }
 
     @PostMapping("form") //AQUI SE RECUPERA LOS DATOS DEL FORMULARIO
-    public String Accion(@Valid @ModelAttribute UsuarioDireccion usuarioDireccion, BindingResult bindingResult, @RequestParam(value = "imagenFile", required = false) MultipartFile imagenFile,
+    public String Accion(@Valid @ModelAttribute UsuarioDireccion usuarioDireccion, BindingResult bindingResult, @RequestParam(value = "imagenFile", required = false) MultipartFile imagenFile, @RequestParam(value = "Estatus", required = false, defaultValue = "0") Integer Estatus,
             Model model) {
 
         if (bindingResult.hasErrors()) {
@@ -191,6 +191,11 @@ public class UsuarioController {
                 e.printStackTrace();
             }
         }
+
+        if (usuarioDireccion.Usuario == null) {
+            usuarioDireccion.Usuario = new Usuario();
+        }
+        usuarioDireccion.Usuario.setEstatus(Estatus);
 
         Result result = new Result();
         if (usuarioDireccion.Usuario.getIdUsuario() == 0) { // agregar usuario

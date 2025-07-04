@@ -281,17 +281,18 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
 
         try {
 
-            result.correct = jdbcTemplate.execute("{CALL GetAllDinamic(?,?,?,?,?)}", (CallableStatementCallback<Boolean>) callableStatement -> {
+            result.correct = jdbcTemplate.execute("{CALL GetAllDinamic(?,?,?,?,?,?)}", (CallableStatementCallback<Boolean>) callableStatement -> {
 
                 callableStatement.setString(1, usuario.getNombre());
                 callableStatement.setString(2, usuario.getApellidoPaterno());
                 callableStatement.setString(3, usuario.getApellidoMaterno());
                 callableStatement.setInt(4, usuario.getRoll().getIdRoll());
-                callableStatement.registerOutParameter(5, java.sql.Types.REF_CURSOR);
+                callableStatement.setInt(5, usuario.getEstatus());
+                callableStatement.registerOutParameter(6, java.sql.Types.REF_CURSOR);
 
                 callableStatement.execute();
 
-                ResultSet resultSet = (ResultSet) callableStatement.getObject(5);
+                ResultSet resultSet = (ResultSet) callableStatement.getObject(6);
 
                 result.objects = new ArrayList<>();
 
@@ -333,6 +334,7 @@ public class UsuarioDAOImplementation implements IUsuarioDAO {
                         usuarioDireccion.Usuario.setCURP(resultSet.getString("CURP"));
 
                         usuarioDireccion.Usuario.setImagen(resultSet.getString("Imagen"));
+                        usuarioDireccion.Usuario.setEstatus(resultSet.getInt("Estatus"));
 
                         usuarioDireccion.Usuario.Roll = new Roll();
                         usuarioDireccion.Usuario.Roll.setIdRoll(resultSet.getInt("idRoll"));
