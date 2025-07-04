@@ -124,6 +124,7 @@ public class UsuarioController {
             return "UsuarioForm";
         } else {
             model.addAttribute("usuarioDireccion", usuarioJPADAOImplementation.GetByid(idUsuario).object);
+            
             return "UsuarioDetail";
         }
 
